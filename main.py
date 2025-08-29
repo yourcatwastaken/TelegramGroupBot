@@ -64,7 +64,7 @@ def main():
     # Unauthorized user handler
     app.add_handler(MessageHandler(filters.ALL & (~allowed_filter), unauthorized))
 
-    # Handler for administrator actions. Bot must have necessary permissions
+    # Handlers for administrator actions. Bot must have necessary permissions
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, delete_service_message))
     app.add_handler(MessageHandler(filters.StatusUpdate.LEFT_CHAT_MEMBER, delete_service_message))
     app.add_handler(MessageHandler(filters.StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED, delete_service_message))
