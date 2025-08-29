@@ -4,13 +4,14 @@ from telegram import Update
 from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 
+from admin import unauthorized, delete_service_message
+
 # Load the environment variables from .env file
 load_dotenv()
 
 # Configure logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
 def get_allowed_users():
@@ -42,10 +43,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(help_text)
 
-async def unauthorized(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Sorry, you do not have permission to use this bot.')
-
-
 def main():
     print('Starting bot...')
     token = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -64,11 +61,20 @@ def main():
     app.add_handler(CommandHandler('start', start, filters=allowed_filter))
     app.add_handler(CommandHandler('help', help_command, filters=allowed_filter))
 
-
+    # Unauthorized user handler
     app.add_handler(MessageHandler(filters.ALL & (~allowed_filter), unauthorized))
+
+    # Handler for administrator actions. Bot must have necessary permissions
+    app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, delete_service_message))
+    app.add_handler(MessageHandler(filters.StatusUpdate.LEFT_CHAT_MEMBER, delete_service_message))
+    app.add_handler(MessageHandler(filters.StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED, delete_service_message))
+    app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_PHOTO, delete_service_message))
+    app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_TITLE, delete_service_message))
+
 
 
     print('Polling...')
+    # Run the bot until the user presses Ctrl-C
     app.run_polling(poll_interval=3)
 
 
