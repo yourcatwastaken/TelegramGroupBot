@@ -62,7 +62,7 @@ def main():
     app.add_handler(CommandHandler('help', help_command, filters=allowed_filter))
 
     # Unauthorized user handler
-    app.add_handler(MessageHandler(filters.ALL & (~allowed_filter), unauthorized))
+    app.add_handler(MessageHandler(filters.ALL & filters.ChatType.PRIVATE & (~allowed_filter), unauthorized))
 
     # Handlers for administrator actions. Bot must have necessary permissions
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, delete_service_message))
