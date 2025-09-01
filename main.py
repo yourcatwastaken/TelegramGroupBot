@@ -4,8 +4,9 @@ from telegram import Update
 from telegram.ext import Application, ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 
-from admin import unauthorized, delete_service_message
-
+from admin import unauthorized
+from group_commands import delete_service_message, rules
+from private_commands import start, help_command
 # Load the environment variables from .env file
 load_dotenv()
 
@@ -32,16 +33,9 @@ def get_allowed_users():
 
 ALLOWED_USERS = get_allowed_users()
 
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
+    logging.error("Exception while handling an update:", exc_info=context.error)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Hey! I\'m the Capybara Group support bot!')
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    help_text = (
-        "Here are some commands you can use:\n"
-        "/start — starts the chat with me.\n"
-        "/help — returns the list of available commands"
-    )
-    await update.message.reply_text(help_text)
 
 def main():
     print('Starting bot...')
@@ -57,9 +51,16 @@ def main():
     # Define a filter for the allowed users
     allowed_filter = filters.User(user_id=ALLOWED_USERS)
 
-    # Commands
-    app.add_handler(CommandHandler('start', start, filters=allowed_filter))
-    app.add_handler(CommandHandler('help', help_command, filters=allowed_filter))
+    # Handlers for private chats (whitelisted users)
+    app.add_handler(CommandHandler('start', start, filters=allowed_filter & filters.ChatType.PRIVATE))
+    app.add_handler(CommandHandler('help', help_command, filters=allowed_filter & filters.ChatType.PRIVATE))
+
+    # Group commands
+    app.add_handler(CommandHandler('rules', rules, filters.ChatType.GROUPS))
+
+
+   # TODO:add /pin command
+
 
     # Unauthorized user handler
     app.add_handler(MessageHandler(filters.ALL & filters.ChatType.PRIVATE & (~allowed_filter), unauthorized))
@@ -71,6 +72,8 @@ def main():
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_PHOTO, delete_service_message))
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_TITLE, delete_service_message))
 
+    # Error handler
+    app.add_error_handler(error_handler)
 
 
     print('Polling...')
