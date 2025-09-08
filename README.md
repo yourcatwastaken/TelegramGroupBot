@@ -1,8 +1,8 @@
 # Group Support Bot
-This is a Telegram bot designed to help with group management. It is built using the `python-telegram-bot` library and features a whitelisting system for access control and admin-level functionality to automatically delete specific service messages.
+This is a Telegram bot designed to help with group management. It is built using the `python-telegram-bot` library and features a hierarchical access system and admin-level functionality to automatically delete specific service messages.
 
 ## Features
-* **Whitelisting:** Only pre-approved users are allowed to use the bot's commands.
+* **Access:** The bot uses two tiers of access control. A list of BOT_OWNERS who have full administrative access to all bot features, and a list of ALLOWED_USERS who can use core functionality. Unauthorized users are blocked.
 * **Admin Control:** Automatically deletes various service messages (e.g., a user leaving or joining) in a group to keep the chat clean.
 * **Modularity:** The bot's functionality is split into separate files for clean and scalable code.
 
@@ -16,7 +16,8 @@ This is a Telegram bot designed to help with group management. It is built using
 Create a file named .env in the root directory of the project and add your Telegram bot token and the user IDs you want to whitelist.
 ``` 
 TELEGRAM_BOT_TOKEN="YOUR_TOKEN"
-USER_IDS="123456789,987654321" 
+BOT_OWNERS="123456789"
+USER_IDS="012345678,901234567" 
 ```
 
 ### 3. Install Dependencies
