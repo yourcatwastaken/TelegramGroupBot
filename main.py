@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from admin import delete_service_message, unauthorized
 from group_commands import rules, pin
-from private_commands import (start, help_command, manage, repo, cancel,
+from private_commands import (start, help_command, manage, repo, cancel, sticker,
     get_user_id, get_group_id, handle_manage_choice, CHOOSE_ACTION, GET_GROUP_ID, GET_USER_ID)
 
 # Load the environment variables from .env file
@@ -84,6 +84,7 @@ def main():
     app.add_handler(MessageHandler(filters.Regex('^Help$'), help_command, filters.ChatType.PRIVATE))
     app.add_handler(MessageHandler(filters.Regex('^Repo$'), repo))
     app.add_handler(MessageHandler(filters.Regex('^Cancel$'), cancel, filters.ChatType.PRIVATE))
+    app.add_handler(MessageHandler(filters.Sticker.ALL, sticker, filters.ChatType.PRIVATE))
 
     # Handlers for groups
     app.add_handler(CommandHandler('rules', rules, filters.ChatType.GROUPS))

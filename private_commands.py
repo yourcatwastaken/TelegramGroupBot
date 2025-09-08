@@ -100,6 +100,9 @@ async def get_user_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
 
 
+async def sticker(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    sticker_id = update.message.sticker.file_id
+    await update.message.reply_text(f'Here\'s the sticker ID:\n {sticker_id}')
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = (
